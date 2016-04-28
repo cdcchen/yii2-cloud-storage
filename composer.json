@@ -1,19 +1,19 @@
 {
   "name": "cdcchen/yii2-cloud-storage",
-  "description": "upyun oop",
+  "description": "yii2 cloud storage component",
   "version": "1.0.0",
   "keywords": [
     "cloud storage",
     "yii2 cloud storage"
   ],
   "type": "php-lib",
-  "homepage": "https://github.com/cdcchen/php-plus",
-  "time": "2016-04-13 22:05:01",
+  "homepage": "https://github.com/cdcchen/yii2-cloud-storage",
+  "time": "2016-04-28 18:05:01",
   "license": "BSD-3-Clause",
   "support": {
-    "issues": "https://github.com/cdcchen/upyun-client/issues",
-    "wiki": "https://github.com/cdcchen/upyun-client/wiki",
-    "source": "https://github.com/cdcchen/upyun-client"
+    "issues": "https://github.com/cdcchen/yii2-cloud-storage/issues",
+    "wiki": "https://github.com/cdcchen/yii2-cloud-storage/wiki",
+    "source": "https://github.com/cdcchen/yii2-cloud-storage"
   },
   "authors": [
     {
@@ -24,7 +24,8 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=5.4.0",
-    "upyun-client": "1.0.x-dev",
+    "cdcchen/curl-client": "1.0.x-dev",
+    "cdcchen/upyun-client": "1.0.x-dev",
     "yiisoft/yii2": "2.0.7"
   },
   "autoload": {
