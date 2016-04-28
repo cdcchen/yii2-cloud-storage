@@ -1,15 +1,14 @@
 {
   "name": "cdcchen/yii2-cloud-storage",
   "description": "yii2 cloud storage component",
-  "version": "1.0.0",
   "keywords": [
     "cloud storage",
     "yii2 cloud storage"
   ],
-  "type": "php-lib",
+  "type": "yii2-extension",
   "homepage": "https://github.com/cdcchen/yii2-cloud-storage",
   "time": "2016-04-28 18:05:01",
-  "license": "BSD-3-Clause",
+  "license": "BSD-4-Clause",
   "support": {
     "issues": "https://github.com/cdcchen/yii2-cloud-storage/issues",
     "wiki": "https://github.com/cdcchen/yii2-cloud-storage/wiki",
