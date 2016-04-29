@@ -8,8 +8,13 @@
 
 namespace cdcchen\cloudstorage;
 
+use cdcchen\upyun\UpYunClient;
 use yii\base\InvalidConfigException;
 
+/**
+ * Class UpYunStorage
+ * @package cdcchen\cloudstorage
+ */
 class UpYunStorage extends Storage
 {
     /**
@@ -53,74 +58,103 @@ class UpYunStorage extends Storage
     protected $_options = [];
 
     /**
-     * 又拍云api接口地址
      * @var UpYunClient
      */
     protected $_handle;
 
+
+    /**
+     * @throws InvalidConfigException
+     */
     public function init()
     {
         parent::init();
 
-        if (empty($this->bucket))
-            throw new InvalidConfigException('bucket is required');
+        if (empty($this->bucket) || empty($this->username)) {
+            throw new InvalidConfigException('Bucket is required');
+        }
 
-        $this->_handle = new UpYunClient($this->bucket, $this->username, $this->password, $this->endpoint, $this->timeout);
+        $this->_handle = new UpYunClient($this->bucket, $this->username, $this->password, $this->endpoint,
+            $this->timeout);
     }
 
+    /**
+     * @param string|array $option
+     * @param mixed|null $value
+     * @return $this
+     */
     public function setOption($option, $value = null)
     {
-        if (is_array($option))
+        if (is_array($option)) {
             $this->_options = array_merge($this->_options, $option);
-        else
+        } else {
             $this->_options[$option] = $value;
+        }
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function resetOption()
     {
         $this->_options = [];
         return $this;
     }
 
+    /**
+     * @return UpYunClient
+     */
     public function getHandle()
     {
         return $this->_handle;
     }
 
-    protected function writeFile($filePath, $fileName)
+
+    /**
+     * @param string $filename
+     * @return string
+     */
+    protected function readFile($filename)
     {
-        return $this->putFile($filePath, $fileName, $this->_options);
+        return $this->_handle->readFile($filename);
     }
 
-    protected function deleteFile($fileUrl)
+    /**
+     * @param string $file_path
+     * @param string $filename
+     * @return array
+     * @throws \ErrorException
+     */
+    protected function writeFile($file_path, $filename)
     {
-        $filePath = parse_url($fileUrl, PHP_URL_PATH);
-        return $filePath ? $this->_handle->deleteFile($filePath) : false;
+        if (empty($file_path) || empty($filename)) {
+            throw new \InvalidArgumentException('filePath and fileName is required.');
+        }
+
+        if (is_file($filename) && !is_readable($filename)) {
+            throw new \ErrorException('fileName is unreadable.');
+        }
+
+        return $this->_handle->writeFile($file_path, $filename, $options, $this->autoMkDir);
     }
 
+    /**
+     * @param string $file_url
+     * @return bool
+     */
+    protected function deleteFile($file_url)
+    {
+        $file_path = parse_url($file_url, PHP_URL_PATH);
+        return $file_path ? $this->_handle->deleteFile($file_path) : false;
+    }
+
+    /**
+     * @param string $file
+     */
     protected function exifFile($file)
     {
 
-    }
-
-    public function readDir($path)
-    {
-        return $this->_handle->readDir($path);
-    }
-
-    protected function putFile($filePath, $fileName, $opts = [])
-    {
-        if (empty($fileName))
-            throw new \InvalidArgumentException('fileName is required.');
-
-        if (empty($filePath))
-            throw new \InvalidArgumentException('write filePath is required.');
-
-        if (@file_exists($fileName) && @is_file($fileName) && @is_readable($fileName))
-            $fileName = fopen($fileName, 'rb');
-
-        return $this->_handle->writeFile($filePath, $fileName, $opts, $this->autoMkDir);
     }
 }

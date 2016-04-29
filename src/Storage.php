@@ -13,22 +13,28 @@ use yii\base\Component;
 
 abstract class Storage extends Component
 {
+    final public function read($fileName)
+    {
+        return $this->readFile($fileName);
+    }
+
     final public function write($filePath, $fileName)
     {
         return $this->writeFile($filePath, $fileName);
     }
 
-    final public function delete($filePath)
+    final public function delete($fileName)
     {
-        return $this->deleteFile($filePath);
+        return $this->deleteFile($fileName);
     }
 
-    final public function exif($filePath)
+    final public function exif($fileName)
     {
-        return $this->exifFile($filePath);
+        return $this->exifFile($fileName);
     }
 
+    abstract protected function readFile($fileName);
     abstract protected function writeFile($filePath, $fileName);
-    abstract protected function deleteFile($filePath);
-    abstract protected function exifFile($filePath);
+    abstract protected function deleteFile($fileName);
+    abstract protected function exifFile($fileName);
 }
