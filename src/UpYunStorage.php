@@ -137,7 +137,7 @@ class UpYunStorage extends Storage
             throw new \ErrorException('fileName is unreadable.');
         }
 
-        return $this->_handle->writeFile($file_path, $filename, $options, $this->autoMkDir);
+        return $this->_handle->writeFile($file_path, $filename, $this->_options, $this->autoMkDir);
     }
 
     /**
