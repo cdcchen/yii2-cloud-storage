@@ -195,6 +195,7 @@ class UpYunStorage extends Storage
 
         $fileInfo = [
             'url' => $fileUrl,
+            'file' => $filename,
             'path' => dirname($filename),
             'name' => basename($filename),
         ];
