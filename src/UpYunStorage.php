@@ -6,7 +6,7 @@
  * Time: 下午11:53
  */
 
-namespace cdcchen\cloudstorage;
+namespace cdcchen\yii\cloudstorage;
 
 use cdcchen\filesystem\PathBuilder;
 use cdcchen\upyun\UpYunClient;
