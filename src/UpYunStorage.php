@@ -8,6 +8,7 @@
 
 namespace cdcchen\cloudstorage;
 
+use cdcchen\filesystem\PathBuilder;
 use cdcchen\upyun\UpYunClient;
 use yii\base\InvalidConfigException;
 
@@ -18,9 +19,9 @@ use yii\base\InvalidConfigException;
 class UpYunStorage extends Storage
 {
     /**
-     * @var null|string
+     * @var string
      */
-    public $endpoint = null;
+    public $bucket;
 
     /**
      * @var string
@@ -33,14 +34,34 @@ class UpYunStorage extends Storage
     public $password;
 
     /**
+     * @var
+     */
+    public $domain;
+
+    /**
+     * @var bool
+     */
+    public $autoGenerateFilename = false;
+
+    /**
      * @var string
      */
-    public $bucket;
+    public $pathFormat;
+
+    /**
+     * @var string
+     */
+    public $filenameFormat;
 
     /**
      * @var bool
      */
     public $autoMkDir = true;
+
+    /**
+     * @var null|string
+     */
+    public $endpoint = null;
 
     /**
      * @var bool
@@ -70,8 +91,12 @@ class UpYunStorage extends Storage
     {
         parent::init();
 
-        if (empty($this->bucket) || empty($this->username)) {
-            throw new InvalidConfigException('Bucket is required');
+        if (empty($this->bucket) || empty($this->username) || empty($this->domain)) {
+            throw new InvalidConfigException('bucket|username|domain is required');
+        }
+
+        if ($this->autoGenerateFilename && (empty($this->filenameFormat))) {
+            throw new InvalidConfigException('filenameFormat is required when autoGenerateFilename is true');
         }
 
         $this->_handle = new UpYunClient($this->bucket, $this->username, $this->password, $this->endpoint,
@@ -111,6 +136,11 @@ class UpYunStorage extends Storage
         return $this->_handle;
     }
 
+    public function getFileUrl($filename)
+    {
+        return $this->domain . '/' . ltrim($filename, '/');
+    }
+
 
     /**
      * @param string $filename
@@ -122,22 +152,43 @@ class UpYunStorage extends Storage
     }
 
     /**
-     * @param string $file_path
      * @param string $filename
+     * @param string $file_path
      * @return array
      * @throws \ErrorException
      */
-    protected function writeFile($file_path, $filename)
+    protected function writeFile($filename, $file_path = null)
     {
+        if (empty($file_path) && !$this->autoGenerateFilename) {
+            throw new \InvalidArgumentException('$file_path is required when autoGenerateFilename is false.');
+        }
+
+        if (empty($file_path)) {
+            $builder = new PathBuilder();
+            $builder->buildPathName($this->pathFormat);
+            $builder->buildFileName($this->filenameFormat);
+            $file_path = $builder->getFilePath();
+            $file_url = $builder->getFileUrl($this->domain);
+        } else {
+            $file_url = $this->getFileUrl($file_path);
+        }
+
         if (empty($file_path) || empty($filename)) {
             throw new \InvalidArgumentException('filePath and fileName is required.');
         }
 
         if (is_file($filename) && !is_readable($filename)) {
-            throw new \ErrorException('fileName is unreadable.');
+            throw new \ErrorException('filename is unreadable.');
         }
 
-        return $this->_handle->writeFile($file_path, $filename, $this->_options, $this->autoMkDir);
+        $result = $this->_handle->writeFile($file_path, $filename, $this->_options, $this->autoMkDir);
+        if ($result) {
+            $result['file_url'] = $file_url;
+            $result['file_path'] = $file_url;
+            $result['file_name'] = dirname($file_path);
+        }
+
+        return $result;
     }
 
     /**
