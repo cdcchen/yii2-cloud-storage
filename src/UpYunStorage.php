@@ -136,6 +136,10 @@ class UpYunStorage extends Storage
         return $this->_handle;
     }
 
+    /**
+     * @param $filename
+     * @return string
+     */
     public function getFileUrl($filename)
     {
         return $this->domain . '/' . ltrim($filename, '/');
@@ -152,52 +156,55 @@ class UpYunStorage extends Storage
     }
 
     /**
+     * @param string $body
      * @param string $filename
-     * @param string $file_path
+     * @param string $prefix
+     * @param string $suffix
      * @return array
      * @throws \ErrorException
      */
-    protected function writeFile($filename, $file_path = null)
+    protected function writeFile($body, $filename = null, $prefix = null, $suffix = null)
     {
-        if (empty($file_path) && !$this->autoGenerateFilename) {
-            throw new \InvalidArgumentException('$file_path is required when autoGenerateFilename is false.');
+        if (empty($filename) && !$this->autoGenerateFilename) {
+            throw new \InvalidArgumentException('$filename is required when autoGenerateFilename is false.');
         }
 
-        if (empty($file_path)) {
+        if (empty($filename)) {
             $builder = new PathBuilder();
-            $builder->buildPathName($this->pathFormat);
-            $builder->buildFileName($this->filenameFormat);
-            $file_path = $builder->getFilePath();
-            $file_url = $builder->getFileUrl($this->domain);
+            $builder->buildPathName($this->pathFormat, $prefix, $suffix)->buildFileName($this->filenameFormat);
+
+            $filename = $builder->getFilePath();
+            $fileUrl = $builder->getFileUrl($this->domain);
         } else {
-            $file_url = $this->getFileUrl($file_path);
+            $fileUrl = $this->getFileUrl($filename);
         }
 
-        if (empty($file_path) || empty($filename)) {
+        if (empty($filename) || empty($filename)) {
             throw new \InvalidArgumentException('filePath and fileName is required.');
         }
 
-        if (is_file($filename) && !is_readable($filename)) {
+        if (is_file($body) && !is_readable($body)) {
             throw new \ErrorException('filename is unreadable.');
         }
 
-        $result = $this->_handle->writeFile($file_path, $filename, $this->_options, $this->autoMkDir);
-        if ($result) {
-            $result['file_url'] = $file_url;
-            $result['file_path'] = $file_url;
-            $result['file_name'] = dirname($file_path);
-        }
+        $result = $this->_handle->writeFile($filename, $body, $this->_options, $this->autoMkDir);
 
-        return $result;
+        $fileInfo = [
+            'url' => $fileUrl,
+            'path' => dirname($filename),
+            'name' => basename($filename),
+        ];
+
+        return is_bool($result) ? $fileInfo : array_merge($fileInfo, $result);
     }
 
     /**
-     * @param string $file_url
+     * @param string $fileUrl
      * @return bool
      */
-    protected function deleteFile($file_url)
+    protected function deleteFile($fileUrl)
     {
-        $file_path = parse_url($file_url, PHP_URL_PATH);
+        $file_path = parse_url($fileUrl, PHP_URL_PATH);
         return $file_path ? $this->_handle->deleteFile($file_path) : false;
     }
 
