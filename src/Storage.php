@@ -18,9 +18,9 @@ abstract class Storage extends Component
         return $this->readFile($filename);
     }
 
-    final public function write($body, $filename = null, $prefix = null, $suffix = null)
+    final public function write($body, $filename = null, $extensionName = null, $prefix = null, $suffix = null)
     {
-        return $this->writeFile($body, $filename, $prefix, $suffix);
+        return $this->writeFile($body, $filename, $extensionName, $prefix, $suffix);
     }
 
     final public function delete($filename)
@@ -34,7 +34,7 @@ abstract class Storage extends Component
     }
 
     abstract protected function readFile($filename);
-    abstract protected function writeFile($body, $filename = null, $prefix = null, $suffix = null);
+    abstract protected function writeFile($body, $filename = null, $extensionName = null, $prefix = null, $suffix = null);
     abstract protected function deleteFile($filename);
     abstract protected function exifFile($filename);
 }

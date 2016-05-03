@@ -11,6 +11,7 @@ namespace cdcchen\cloudstorage;
 use cdcchen\filesystem\PathBuilder;
 use cdcchen\upyun\UpYunClient;
 use yii\base\InvalidConfigException;
+use yii\helpers\FileHelper;
 
 /**
  * Class UpYunStorage
@@ -158,20 +159,27 @@ class UpYunStorage extends Storage
     /**
      * @param string $body
      * @param string $filename
+     * @param string $extensionName
      * @param string $prefix
      * @param string $suffix
      * @return array
      * @throws \ErrorException
      */
-    protected function writeFile($body, $filename = null, $prefix = null, $suffix = null)
+    protected function writeFile($body, $filename = null, $extensionName = '', $prefix = null, $suffix = null)
     {
         if (empty($filename) && !$this->autoGenerateFilename) {
             throw new \InvalidArgumentException('$filename is required when autoGenerateFilename is false.');
         }
 
+        if (is_file($body) && !is_readable($body)) {
+            throw new \ErrorException('filename is unreadable.');
+        }
+
         if (empty($filename)) {
+            $extensionName = $this->getExtensionName($body);
             $builder = new PathBuilder();
-            $builder->buildPathName($this->pathFormat, $prefix, $suffix)->buildFileName($this->filenameFormat);
+            $builder->buildPathName($this->pathFormat, $prefix, $suffix)
+                    ->buildFileName($this->filenameFormat, $extensionName, false);
 
             $filename = $builder->getFilePath();
             $fileUrl = $builder->getFileUrl($this->domain);
@@ -183,10 +191,6 @@ class UpYunStorage extends Storage
             throw new \InvalidArgumentException('filePath and fileName is required.');
         }
 
-        if (is_file($body) && !is_readable($body)) {
-            throw new \ErrorException('filename is unreadable.');
-        }
-
         $result = $this->_handle->writeFile($filename, $body, $this->_options, $this->autoMkDir);
 
         $fileInfo = [
@@ -196,6 +200,32 @@ class UpYunStorage extends Storage
         ];
 
         return is_bool($result) ? $fileInfo : array_merge($fileInfo, $result);
+    }
+
+    /**
+     * @param $body
+     * @return array|null
+     * @throws InvalidConfigException
+     */
+    protected static function getExtensionName($body)
+    {
+        if (is_file($body)) {
+            $info = getimagesize($body);
+            if (empty($info)) {
+                $mimeType = FileHelper::getMimeType($body);
+                if ($mimeType && $extensions = FileHelper::getExtensionsByMimeType($mimeType)) {
+                    return $extensions ? current($extensions) : null;
+                }
+            } else {
+                $mimeType = $info[2];
+                return image_type_to_extension($mimeType, false);
+            }
+        } elseif ($info = getimagesizefromstring($body)) {
+            $mimeType = $info[2];
+            return image_type_to_extension($mimeType, false);
+        }
+
+        return null;
     }
 
     /**
