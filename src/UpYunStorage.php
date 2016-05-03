@@ -157,7 +157,7 @@ class UpYunStorage extends Storage
     }
 
     /**
-     * @param string $body
+     * @param string $body filename or file content
      * @param string $filename
      * @param string $extensionName
      * @param string $prefix
@@ -171,7 +171,7 @@ class UpYunStorage extends Storage
             throw new \InvalidArgumentException('$filename is required when autoGenerateFilename is false.');
         }
 
-        if (is_file($body) && !is_readable($body)) {
+        if (@is_file($body) && !is_readable($body)) {
             throw new \ErrorException('filename is unreadable.');
         }
 
@@ -209,7 +209,7 @@ class UpYunStorage extends Storage
      */
     protected static function getExtensionName($body)
     {
-        if (is_file($body)) {
+        if (@is_file($body)) {
             $info = getimagesize($body);
             if (empty($info)) {
                 $mimeType = FileHelper::getMimeType($body);
