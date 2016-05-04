@@ -47,6 +47,14 @@ class UploadedFile extends YiiUploadFile
     }
 
     /**
+     * @inheritdoc
+     */
+    public function saveAs($file, $deleteTempFile = true)
+    {
+        return $this->upload($file, null, null, $deleteTempFile);
+    }
+
+    /**
      * @param Storage $storage
      * @return $this
      */
