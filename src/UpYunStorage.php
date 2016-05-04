@@ -181,7 +181,7 @@ class UpYunStorage extends Storage
             $builder->buildPathName($this->pathFormat, $prefix, $suffix)
                     ->buildFileName($this->filenameFormat, $extensionName, false);
 
-            $filename = $builder->getFilePath();
+            $filename = $builder->getFilePath('/');
             $fileUrl = $builder->getFileUrl($this->domain);
         } else {
             $fileUrl = $this->getFileUrl($filename);
