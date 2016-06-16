@@ -23,8 +23,8 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=5.4.0",
-    "cdcchen/curl-client": "1.0.x-dev",
-    "cdcchen/upyun-client": "1.0.x-dev",
+    "cdcchen/curl-client": "^1.0.0",
+    "cdcchen/upyun-client": "^1.0.0",
     "cdcchen/file-helper": "1.0.x-dev",
     "yiisoft/yii2": "*"
   },

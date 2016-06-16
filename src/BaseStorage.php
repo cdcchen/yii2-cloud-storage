@@ -12,10 +12,10 @@ namespace cdcchen\yii\cloudstorage;
 use yii\base\Component;
 
 /**
- * Class Storage
+ * Class BaseStorage
  * @package cdcchen\yii\cloudstorage
  */
-abstract class Storage extends Component
+abstract class BaseStorage extends Component
 {
     /**
      * @param $filename
@@ -71,7 +71,13 @@ abstract class Storage extends Component
      * @param null|string $suffix
      * @return array|bool
      */
-    abstract protected function writeFile($body, $filename = null, $extensionName = null, $prefix = null, $suffix = null);
+    abstract protected function writeFile(
+        $body,
+        $filename = null,
+        $extensionName = null,
+        $prefix = null,
+        $suffix = null
+    );
 
     /**
      * @param string $filename

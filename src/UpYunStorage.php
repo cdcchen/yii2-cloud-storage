@@ -17,7 +17,7 @@ use yii\helpers\FileHelper;
  * Class UpYunStorage
  * @package cdcchen\cloudstorage
  */
-class UpYunStorage extends Storage
+class UpYunStorage extends BaseStorage
 {
     /**
      * @var string
