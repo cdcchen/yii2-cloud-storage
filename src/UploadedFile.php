@@ -19,7 +19,7 @@ use yii\web\UploadedFile as YiiUploadFile;
 class UploadedFile extends YiiUploadFile
 {
     /**
-     * @var Storage
+     * @var BaseStorage
      */
     protected $storage;
 
@@ -55,10 +55,10 @@ class UploadedFile extends YiiUploadFile
     }
 
     /**
-     * @param Storage $storage
+     * @param BaseStorage $storage
      * @return $this
      */
-    public function setStorage(Storage $storage)
+    public function setStorage(BaseStorage $storage)
     {
         $this->storage = $storage;
         return $this;
@@ -81,7 +81,7 @@ class UploadedFile extends YiiUploadFile
      */
     protected function beforeUpload()
     {
-        if ($this->storage instanceof Storage)
+        if ($this->storage instanceof BaseStorage)
             return true;
 
         throw new ErrorException('Please call setStorage method to set cloud storage instance.');
