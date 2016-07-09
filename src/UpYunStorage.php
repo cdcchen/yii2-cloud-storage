@@ -148,6 +148,25 @@ class UpYunStorage extends BaseStorage
         return $this->domain . '/' . ltrim($filename, '/');
     }
 
+    /**
+     * @param null|string $prefix
+     * @param null|string $suffix
+     * @param string $extensionName
+     * @param null|string $filename
+     * @return PathBuilder
+     */
+    public function getAutoPathBuilder($prefix = null, $suffix = null, $extensionName = '', $filename = null)
+    {
+        if (empty($extensionName) && $filename) {
+            $extensionName = $this->getExtensionName($filename);
+        }
+        $builder = new PathBuilder();
+        $builder->buildPathName($this->pathFormat, $prefix, $suffix)
+                ->buildFileName($this->filenameFormat, $extensionName, false);
+
+        return $builder;
+    }
+
 
     /**
      * @param string $filename
@@ -178,10 +197,7 @@ class UpYunStorage extends BaseStorage
         }
 
         if (empty($filename)) {
-            $extensionName = $this->getExtensionName($body);
-            $builder = new PathBuilder();
-            $builder->buildPathName($this->pathFormat, $prefix, $suffix)
-                    ->buildFileName($this->filenameFormat, $extensionName, false);
+            $builder = $this->getAutoPathBuilder($prefix, $suffix, $extensionName, $body);
 
             $filename = $builder->getFilePath('/');
             $fileUrl = $builder->getFileUrl($this->domain);
