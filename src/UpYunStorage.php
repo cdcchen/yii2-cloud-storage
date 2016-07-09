@@ -9,6 +9,8 @@
 namespace cdcchen\yii\cloudstorage;
 
 use cdcchen\filesystem\PathBuilder;
+use cdcchen\upyun\av\FetchFileTask;
+use cdcchen\upyun\AVClient;
 use cdcchen\upyun\UpYunClient;
 use yii\base\InvalidConfigException;
 use yii\helpers\FileHelper;
@@ -241,9 +243,35 @@ class UpYunStorage extends BaseStorage
 
     /**
      * @param string $file
+     * @return array
      */
     protected function exifFile($file)
     {
+        return [];
+    }
 
+    /**
+     * @param string $notifyUrl
+     * @param FetchFileTask[] $tasks
+     * @return array
+     */
+    public function AsyncFetchFiles($notifyUrl, array $tasks)
+    {
+        $client = new AVClient($this->username, $this->password);
+        return $client->fetchFiles($this->bucket, $tasks, $notifyUrl);
+    }
+
+    /**
+     * @param string $notifyUrl
+     * @param string $url
+     * @param string $saveAs
+     * @param bool $random
+     * @param bool $overwrite
+     * @return array
+     */
+    public function AsyncFetchFile($notifyUrl, $url, $saveAs, $random = false, $overwrite = true)
+    {
+        $client = new AVClient($this->username, $this->password);
+        return $client->fetchFile($this->bucket, $notifyUrl, $url, $saveAs, $random, $overwrite);
     }
 }
