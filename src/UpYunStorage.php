@@ -77,6 +77,11 @@ class UpYunStorage extends BaseStorage
     public $timeout = 60;
 
     /**
+     * @var bool
+     */
+    public $enableSSL = false;
+
+    /**
      * @var array
      */
     protected $_options = [];
@@ -100,6 +105,10 @@ class UpYunStorage extends BaseStorage
 
         if ($this->autoGenerateFilename && (empty($this->filenameFormat))) {
             throw new InvalidConfigException('filenameFormat is required when autoGenerateFilename is true');
+        }
+
+        if (stripos($this->domain, 'http:') !== 0 && stripos($this->domain, 'https:') !== 0) {
+            $this->domain = ($this->enableSSL ? 'https' : 'http') . '://' . ltrim($this->domain, '/');
         }
 
         $this->_handle = new UpYunClient($this->bucket, $this->username, $this->password, $this->endpoint,
